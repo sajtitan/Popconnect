@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - Secure Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+    
+        body {
+            background: linear-gradient(135deg, #000000, #7CC639); /* Black to muted lime green gradient */
+            color: #5C6358; /* Lighter olive green text */
+            min-height: 100vh;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        h1 {
+            font-size: 3rem;
+            color: #7CC639; /* Muted lime green */
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeInDown 1s ease-out;
+        }
+    
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background: #D9DAD7; /* Softer light gray */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            animation: fadeInUp 1s ease-out;
+        }
+    
+        h2 {
+            font-size: 1.8rem;
+            color: #7CC639; /* Muted lime green */
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    
+        #chatbox {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #2E3529; /* Slightly lighter dark green */
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+    
+        .message {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease-out;
+        }
+    
+        .message.user {
+            background: #5C6358; /* Lighter olive green */
+            color: #D9DAD7; /* Softer light gray text */
+            margin-left: auto;
+            text-align: right;
+        }
+    
+        .message.bot {
+            background: #7CC639; /* Muted lime green */
+            color: #1A1F16; /* Softer dark green text */
+            margin-right: auto;
+        }
+    
+        .message .timestamp {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+    
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+    
+        #chatInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #5C6358; /* Lighter olive green border */
+            border-radius: 8px;
+            background: #D9DAD7; /* Softer light gray background */
+            color: #5C6358; /* Lighter olive green text */
+        }
+    
+        #chatInput:focus {
+            outline: none;
+            border-color: #7CC639; /* Muted lime green on focus */
+            box-shadow: 0 0 5px rgba(124, 198, 57, 0.3);
+        }
+    
+        .chat-input button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: #7CC639; /* Muted lime green */
+            color: #1A1F16; /* Softer dark green text */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    
+        .chat-input button:hover {
+            background: #6BAF32; /* Slightly darker muted lime green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 198, 57, 0.4);
+        }
+    
+        .loading {
+            display: none;
+            font-size: 0.9rem;
+            color: #7CC639; /* Muted lime green */
+            margin-top: 5px;
+            animation: pulse 1.5s infinite;
+        }
+    
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    
+        .logout {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: #7CC639; /* Muted lime green */
+            color: #1A1F16; /* Softer dark green text */
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+    
+        .logout:hover {
+            background: #6BAF32; /* Slightly darker muted lime green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 198, 57, 0.4);
+        }
+    
+        /* Responsive Design remains unchanged */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .chat-container { padding: 15px; max-width: 90%; }
+            #chatInput, .chat-input button { font-size: 0.9rem; padding: 8px; }
+        }
+    
+        .blocked-ips-container {
+            width: 100%;
+            max-width: 600px;
+            background: #D9DAD7; /* Softer light gray */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeInUp 1s ease-out;
+        }
+    
+        .blocked-ips-container h2 {
+            font-size: 1.8rem;
+            color: #7CC639; /* Muted lime green */
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    
+        #blocked-ips-list {
+            padding: 10px;
+            background: #2E3529; /* Slightly lighter dark green */
+            border-radius: 8px;
+        }
+    
+        .blocked-ip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #5C6358; /* Lighter olive green */
+            color: #D9DAD7; /* Softer light gray text */
+            border-radius: 15px;
+        }
+    
+        .blocked-ip button {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: #7CC639; /* Muted lime green */
+            color: #1A1F16; /* Softer dark green text */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    
+        .blocked-ip button:hover {
+            background: #6BAF32; /* Slightly darker muted lime green on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 198, 57, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <h1>Chatbot - Secure Monitor</h1>
+    <div class="chat-container">
+        <h2>Chatbot</h2>
+        <div id="chatbox"></div>
+        <div class="chat-input">
+            <input id="chatInput" type="text" placeholder="Type 'report', 'exit', or 'blocked'">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div class="loading" id="loading">Loading...</div>
+    </div>
+    <div class="blocked-ips-container">
+        <h2>Blocked IPs</h2>
+        <div id="blocked-ips-list"></div>
+    </div>
+    <a href="/logout" class="logout">Logout</a>
+
+    <script src="chatbot.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92a9a844abe2bcc8',t:'MTc0MzY5NDc1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
